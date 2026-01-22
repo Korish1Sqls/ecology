@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Экологиялық ахуалды бақылау жүйесі</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Scroll buttons -->
+    <button class="scroll-to-top" id="scrollToTop" title="Жоғарыға">↑</button>
+    <button class="scroll-to-bottom" id="scrollToBottom" title="Төменге">↓</button>
+    
+    <!-- Popup квадратик в середине экрана -->
+    <div id="center-popup" class="popup-center">
+        <div class="popup-content">
+            <h3 class="popup-title" id="popup-title">Подтверждение удаления</h3>
+            <p id="popup-message">Вы уверены, что хотите удалить этот аккаунт?</p>
+            <div class="popup-buttons">
+                <button class="btn btn-danger" id="popup-confirm-btn">Удалить</button>
+                <button class="btn btn-secondary" id="popup-cancel-btn">Отмена</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Header Section -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="profile-section">
+                        <button id="profile-btn" class="profile-btn" data-i18n="profile-button">Тіркелу</button>
+                        <div id="user-profile" class="user-profile hidden">
+                            <div class="user-icon" id="user-icon">U</div>
+                            <span class="user-name" id="user-name">Пайдаланушы</span>
+                            <!-- Выпадающее меню -->
+                            <div id="user-dropdown" class="user-dropdown">
+                                <div class="dropdown-item" id="admin-panel-btn" data-i18n="admin-panel" style="display: none;">Админ панель</div>
+                                <div class="dropdown-item logout-item" id="logout-btn" data-i18n="logout">Шығу</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="logo">
+                        <img src="img/icon.png" alt="Экологиялық ахуалды бақылау жүйесі">
+                        <h1 data-i18n="site-title">Экологиялық ахуалды бақылау жүйесі</h1>
+                    </div>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#" class="nav-link active" data-page="main" data-i18n="nav-home">Басты бет</a></li>
+                        <li><a href="#" class="nav-link" data-page="data-view" data-i18n="nav-data-view">Деректерді көру</a></li>
+                        <li><a href="#" class="nav-link" data-page="news" data-i18n="nav-news">Эко-жаңалықтар</a></li>
+                        <!-- Для администратора -->
+                        <li class="admin-only"><a href="#" class="nav-link" data-page="pollution-data" data-i18n="nav-pollution-data">Ластану деректерін енгізу</a></li>
+                        <!-- Для обычных пользователей -->
+                        <li class="user-only"><a href="#" class="nav-link" data-page="services" data-i18n="nav-services">Қызметтер</a></li>
+                        <li class="user-only"><a href="#" class="nav-link" data-page="my-orders" data-i18n="nav-my-orders">Менің тапсырыстарым</a></li>
+                    </ul>
+                </nav>
+                <div class="header-right">
+                    <div class="language-switcher">
+                        <button class="lang-btn active" data-lang="kk">KZ</button>
+                        <button class="lang-btn" data-lang="ru">RU</button>
+                        <button class="lang-btn" data-lang="en">ENG</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-tab="login" data-i18n="login-tab">Кіру</button>
+                <button class="auth-tab" data-tab="register" data-i18n="register-tab">Тіркелу</button>
+            </div>
+            
+            <form id="login-form" class="auth-form active">
+                <div class="form-group">
+                    <label for="login-email" data-i18n="email-label">Электрондық пошта</label>
+                    <input type="email" id="login-email" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password" data-i18n="password-label">Құпия сөз</label>
+                    <input type="password" id="login-password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-block" data-i18n="login-button">Кіру</button>
+            </form>
+            
+            <form id="register-form" class="auth-form">
+                <div class="form-group">
+                    <label for="register-name" data-i18n="name-label">Аты-жөні</label>
+                    <input type="text" id="register-name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-email" data-i18n="email-label">Электрондық пошта</label>
+                    <input type="email" id="register-email" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password" data-i18n="password-label">Құпия сөз</label>
+                    <input type="password" id="register-password" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-confirm-password" data-i18n="confirm-password-label">Құпия сөзді растау</label>
+                    <input type="password" id="register-confirm-password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-block" data-i18n="register-button">Тіркелу</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Panel Modal -->
+    <div id="admin-modal" class="modal">
+        <div class="modal-content admin-modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 data-i18n="admin-panel-title">Админ панелі</h2>
+            
+            <div id="admin-content">
+                <div class="form-group">
+                    <button id="show-users-btn" class="btn btn-block" data-i18n="show-all-users">Барлық пайдаланушыларды көрсету</button>
+                </div>
+                
+                <div class="form-group">
+                    <button id="show-all-orders-btn" class="btn btn-info btn-block" data-i18n="show-all-orders">Барлық тапсырыстарды көрсету</button>
+                </div>
+                
+                <div class="form-group">
+                    <button id="show-all-pollution-data-btn" class="btn btn-info btn-block" data-i18n="show-all-pollution-data">Барлық ластану деректерін көрсету</button>
+                </div>
+                
+                <!-- Очистка данных -->
+                <div class="form-group" style="margin-top: 30px; border-top: 2px solid var(--danger-color); padding-top: 20px;">
+                    <h3 data-i18n="clear-data-title">Деректерді тазарту</h3>
+                    <p style="margin-bottom: 15px; color: #666;" data-i18n="clear-data-warning">Ескерту: Бұл операциялардың әсері кері қайтарылмайды!</p>
+                    
+                    <div class="form-group">
+                        <button id="clear-all-users-btn" class="btn btn-danger btn-block" data-i18n="clear-all-users-button">Барлық аккаунттарды тазарту (админнен басқа)</button>
+                        <p style="margin-top: 10px; font-size: 0.9rem; color: #666;" data-i18n="clear-all-users-warning">Админнен басқа барлық пайдаланушыларды жояды: Админ (admin@ad)</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button id="clear-all-orders-btn" class="btn btn-danger btn-block" data-i18n="clear-all-orders-button">Барлық тапсырыстарды тазарту</button>
+                        <p style="margin-top: 10px; font-size: 0.9rem; color: #666;" data-i18n="clear-all-orders-warning">Барлық пайдаланушылардың барлық тапсырыстарын жояды</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button id="clear-all-pollution-data-btn" class="btn btn-danger btn-block" data-i18n="clear-all-pollution-data-button">Барлық ластану деректерін тазарту</button>
+                        <p style="margin-top: 10px; font-size: 0.9rem; color: #666;" data-i18n="clear-all-pollution-data-warning">Барлық ластану деректерін жояды</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button id="clear-all-data-btn" class="btn btn-danger btn-block" data-i18n="clear-all-data-button">БАРЛЫҚ ДЕРЕКТЕРДІ ТАЗАРТУ (барлық аккаунттар, тапсырыстар, деректер)</button>
+                        <p style="margin-top: 10px; font-size: 0.9rem; color: #dc3545; font-weight: bold;" data-i18n="clear-all-data-warning">Барлық пайдаланушыларды, тапсырыстарды және ластану деректерін жояды. Тек админ қалады!</p>
+                    </div>
+                </div>
+                
+                <div id="admin-message" class="message-box hidden"></div>
+                
+                <div id="users-list-container" class="hidden">
+                    <h3 data-i18n="all-users-list">Барлық пайдаланушылар:</h3>
+                    <div id="admin-users-list" class="admin-users-list"></div>
+                </div>
+                
+                <div id="orders-list-container" class="hidden">
+                    <h3 data-i18n="all-orders-list">Барлық тапсырыстар:</h3>
+                    <div id="admin-orders-list" class="admin-users-list"></div>
+                </div>
+                
+                <div id="pollution-data-list-container" class="hidden">
+                    <h3 data-i18n="all-pollution-data-list">Барлық ластану деректері:</h3>
+                    <div id="admin-pollution-data-list" class="admin-users-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Account Modal -->
+    <div id="delete-modal" class="modal-overlay">
+        <div class="modal-content-wide">
+            <h3 data-i18n="delete-account-title">Аккаунтты жою</h3>
+            <p data-i18n="delete-account-user">Пайдаланушы: <span id="delete-user-email"></span></p>
+            <div class="form-group">
+                <label for="delete-reason" data-i18n="delete-reason-label">Жою себебі</label>
+                <textarea id="delete-reason" class="form-control" rows="4" placeholder="Себебін жазыңыз..." data-i18n-placeholder="delete-reason-placeholder"></textarea>
+            </div>
+            <div class="form-row">
+                <button onclick="confirmDeleteUser()" class="btn btn-danger" data-i18n="delete-button">Жою</button>
+                <button onclick="cancelDeleteUser()" class="btn btn-warning" data-i18n="cancel-button">Болдырмау</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div id="payment-modal" class="modal">
+        <div class="modal-content payment-modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 data-i18n="payment-title">Төлем жасау</h2>
+            <div id="payment-order-details"></div>
+            
+            <form id="payment-form">
+                <div class="form-group">
+                    <label data-i18n="payment-method-label">Төлем әдісі</label>
+                    <div class="payment-types">
+                        <div class="payment-type">
+                            <input type="radio" id="payment-card" name="payment-method" value="card" checked>
+                            <label for="payment-card">
+                                <span class="payment-icon">💳</span>
+                                <span data-i18n="payment-card">Банк картасы</span>
+                            </label>
+                        </div>
+                        <div class="payment-type">
+                            <input type="radio" id="payment-wallet" name="payment-method" value="wallet">
+                            <label for="payment-wallet">
+                                <span class="payment-icon">💰</span>
+                                <span data-i18n="payment-wallet">Электрондық әмиян</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="card-details" class="payment-form">
+                    <div class="form-group">
+                        <label for="card-number" data-i18n="card-number-label">Карта нөмірі</label>
+                        <input type="text" id="card-number" class="form-control" placeholder="0000 0000 0000 0000" maxlength="19">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="card-expiry" data-i18n="card-expiry-label">Мерзімі</label>
+                                <input type="text" id="card-expiry" class="form-control" placeholder="АА/ЖЖ">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="card-cvv" data-i18n="card-cvv-label">CVV</label>
+                                <input type="password" id="card-cvv" class="form-control" placeholder="123" maxlength="3">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="card-holder" data-i18n="card-holder-label">Карта иесі</label>
+                        <input type="text" id="card-holder" class="form-control" placeholder="Аты-жөні">
+                    </div>
+                </div>
+                
+                <div id="wallet-details" class="payment-form hidden">
+                    <div class="form-group">
+                        <label for="wallet-type" data-i18n="wallet-type-label">Электрондық әмиян түрі</label>
+                        <select id="wallet-type" class="form-control">
+                            <option value="kaspi" data-i18n="kaspi-wallet">Kaspi әмияны</option>
+                            <option value="jusan" data-i18n="jusan-wallet">Jusan әмияны</option>
+                            <option value="halyk" data-i18n="halyk-wallet">Halyk әмияны</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="wallet-phone" data-i18n="wallet-phone-label">Телефон нөмірі</label>
+                        <input type="tel" id="wallet-phone" class="form-control" placeholder="+7 777 123 4567">
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-block" id="submit-payment-btn" data-i18n="pay-button">Төлеу</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <h2 data-i18n="hero-title">Экологиялық ахуалды бақылау жүйесі</h2>
+                <p data-i18n="hero-description">Қоқыс орындары мен ауа сапасы туралы деректерді енгізу және көруге арналған интеграцияланған жүйе. Таза әлем үшін бірге жұмыс істейік!</p>
+                <a href="#" class="btn" id="hero-button" data-i18n="hero-button">Деректерді енгізу</a>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="about">
+            <div class="container">
+                <h2 class="section-title" data-i18n="about-title">Жүйе туралы</h2>
+                <div class="about-content">
+                    <div class="about-text">
+                        <p data-i18n="about-text-1">Экологиялық ахуалды бақылау жүйесі - бұл қоқыс орындары мен ауа сапасы туралы деректерді жинау, сақтау және талдауға арналған заманауи платформа.</p>
+                        <p data-i18n="about-text-2">Біздің жүйе экологиялық мәселелерді шешуге және қоршаған ортаны қорғауға бағытталған. Жүйе арқылы:</p>
+                        <ul style="margin: 15px 0 15px 20px;">
+                            <li data-i18n="about-feature-1">Қоқыс орындары туралы деректерді енгізу және бақылау</li>
+                            <li data-i18n="about-feature-2">Ауа сапасының көрсеткіштерін тіркеу</li>
+                            <li data-i18n="about-feature-3">Су ластануы туралы деректерді жинау</li>
+                            <li data-i18n="about-feature-4">Экологиялық есептерді қалыптастыру</li>
+                            <li data-i18n="about-feature-5">Статистикалық талдауларды жүргізу</li>
+                        </ul>
+                        <p data-i18n="about-text-3">Біздің мақсатымыз - таза және экологиялық таза қаланы құру.</p>
+                    </div>
+                    <div class="about-image">
+                        <img src="img/foto.jpg" alt="Экологиялық мониторинг суреті" style="width: 100%; height: 350px; object-fit: cover; border-radius: 8px;">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pollution Map Section -->
+        <section class="pollution-map">
+            <div class="container">
+                <h2 class="section-title" data-i18n="pollution-map-title">Экологиялық карта</h2>
+                <p style="text-align: center; margin-bottom: 30px; max-width: 800px; margin-left: auto; margin-right: auto;" data-i18n="pollution-map-description">
+                    Қаланың экологиялық жағдайын көрсететін интерактивті карта. Ластану деңгейлері мен қоршаған ортаның жалпы жағдайын бақылау.
+                </p>
+                
+                <!-- Кнопки переключения изображений -->
+                <div class="map-controls">
+                    <button class="map-btn active" data-map="vod" data-i18n="water-map-btn">Су ластануы</button>
+                    <button class="map-btn" data-map="mys" data-i18n="waste-map-btn">Қоқыс орындары</button>
+                    <button class="map-btn" data-map="voz" data-i18n="air-map-btn">Ауа сапасы</button>
+                </div>
+                
+                <div class="map-container">
+                    <img src="img/vod.png" alt="Қаланың экологиялық картасы" class="map-image active" id="vod-map">
+                    <img src="img/mys.png" alt="Қаланың қоқыс картасы" class="map-image" id="mys-map">
+                    <img src="img/voz.png" alt="Қаланың ауа сапасы картасы" class="map-image" id="voz-map">
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Data View Page -->
+    <div class="data-view-page">
+        <section class="hero">
+            <div class="container">
+                <h2 data-i18n="data-view-title">Деректерді көру</h2>
+                <p data-i18n="data-view-description">Қоқыс орындары, ауа сапасы және су ластануы туралы соңғы деректерді қарау. Экологиялық жағдайды бақылау.</p>
+            </div>
+        </section>
+
+        <section class="data-view">
+            <div class="container">
+                <div class="data-controls">
+                    <div class="filter-group">
+                        <select id="filter-type" class="form-control">
+                            <option value="all" data-i18n="all-data">Барлық деректер</option>
+                            <option value="water" data-i18n="water-data">Су ластануы</option>
+                            <option value="air" data-i18n="air-data">Ауа сапасы</option>
+                            <option value="waste" data-i18n="waste-data">Қоқыс орындары</option>
+                            <option value="radioactive" data-i18n="radioactive-data">Радиоактивті ластану</option>
+                            <option value="noise" data-i18n="noise-data">Шу ластануы</option>
+                            <option value="assessment" data-i18n="assessment-data">Бағалау</option>
+                        </select>
+                        <input type="date" id="filter-date" class="form-control">
+                        <input type="text" id="filter-location" class="form-control" data-i18n-placeholder="filter-location" placeholder="Орналасқан жері бойынша сүзгі">
+                        <button id="apply-filters-btn" class="btn" data-i18n="apply-filters">Сүзгілерді қолдану</button>
+                        <button id="clear-filters-btn" class="btn btn-secondary" data-i18n="clear-filters">Сүзгілерді тазарту</button>
+                    </div>
+                    <button id="export-btn" class="btn" data-i18n="export-button">Есепті жүктеу</button>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th data-i18n="table-date">Күні</th>
+                                <th data-i18n="table-type">Түрі</th>
+                                <th data-i18n="table-location">Орналасқан жері</th>
+                                <th data-i18n="table-data">Деректер</th>
+                                <th data-i18n="table-action">Әрекет</th>
+                            </tr>
+                        </thead>
+                        <tbody id="data-view-tbody">
+                            <!-- Данные будут загружены динамически -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- News Page -->
+    <div class="news-page">
+        <section class="hero">
+            <div class="container">
+                <h2 data-i18n="news-title">Экологиялық жаңалықтар</h2>
+                <p data-i18n="news-description">Соңғы экологиялық жаңалықтар, есептер және мониторинг деректері</p>
+            </div>
+        </section>
+    
+        <section class="news-section">
+            <div class="container">
+              <div class="news-grid">
+                <!-- 1 -->
+                <a href="https://www.kazhydromet.kz/en/post/3125" target="_blank" class="news-card-link">
+                  <div class="news-image" style="background-image:  url('img//1.jpg')"></div>
+                  <div class="news-content">
+                    <div class="date" data-i18n="news-date-1">2025 ж.</div>
+                    <h3 data-i18n="news-title-1">Климаттың өзгеруін мониторингілеу жөніндегі жылдық бюллетень</h3>
+                    <p data-i18n="news-desc-1">Казгидромет 2024 жылғы климаттық өзгерістер мен Қазақстан аумағындағы ауа температурасы мен жауын‑шашын режимі туралы жылдық бюллетень жариялады.</p>
+                  </div>
+                </a>
+                <!-- 2 -->
+                <a href="https://astanatimes.com/2026/01/kazakhstans-industrial-emissions-top-2-million-tons-in-2024/" target="_blank" class="news-card-link">
+                  <div class="news-image" style="background-image:  url('img/2.jpg')"></div>
+                  <div class="news-content">
+                    <div class="date" data-i18n="news-date-2">2025 ж.</div>
+                    <h3 data-i18n="news-title-2">Қазақстандағы өнеркәсіптік шығарындылар 2 миллион тоннадан асты</h3>
+                    <p data-i18n="news-desc-2">2024 жылы Қазақстанда 2,27 млн тонна ластаушы заттар шығарылды, олардың едәуір бөлігі ірі өнеркәсіптік өңірлерге тиесілі.</p>
+                  </div>
+                </a>
+                <!-- 3 -->
+                <a href="https://carececo.org/en/main/news/chto-obsuzhdali-kazakhstan-i-uzbekistan-na-7-om-zasedanii-kazakhstansko-uzbekistanskoy-sovmest/" target="_blank" class="news-card-link">
+                  <div class="news-image" style="background-image:url('img/3.jpg')"></div>
+                  <div class="news-content">
+                    <div class="date" data-i18n="news-date-3">2024 ж.</div>
+                    <h3 data-i18n="news-title-3">Қазақстан мен Өзбекстанның трансшекаралық өзен экожүйесін қорғауы</h3>
+                    <p data-i18n="news-desc-3">Жайық және трансшекаралық су нысандары экожүйесін сақтау бойынша қазақстандық‑өзбек бірлескен жұмыс тобының отырысында ластану көздерін түгендеу қаралды.</p>
+                  </div>
+                </a>
+                <!-- 4 -->
+                <a href="https://www.worldbank.org/en/news/press-release/2023/04/25/kazakhstan-discusses-actions-to-reduce-air-pollution-with-partners" target="_blank" class="news-card-link">
+                  <div class="news-image" style="background-image:  url('img/4.jpeg')"></div>
+                  <div class="news-content">
+                    <div class="date" data-i18n="news-date-4">2025 ж.</div>
+                    <h3 data-i18n="news-title-4">Қазақстан ауаның ластануын азайту жөніндегі іс‑қимылдарды талқылады</h3>
+                    <p data-i18n="news-desc-4">Экология министрлігі халықаралық серіктестермен бірге ауа сапасын басқаруды жақсарту және ҚР Экологиялық кодексі шеңберінде ластануды азайту жолдарын талқылады.</p>
+                  </div>
+                </a>
+                <!-- 5 -->
+                <a href="https://unece.org/sites/default/files/2025-04/Sector%20Review%20Environment%20Statistics%202024%20Kazakhstan.pdf" target="_blank" class="news-card-link">
+                  <div class="news-image" style="background-image:  url('img/5.png')"></div>
+                  <div class="news-content">
+                    <div class="date" data-i18n="news-date-5">2025 ж.</div>
+                    <h3 data-i18n="news-title-5">Қазақстанда қоршаған орта статистикасының 2024 жылға шолуы</h3>
+                    <p data-i18n="news-desc-5">Қоршаған орта статистикасына арналған жаңа шолу ауа, су және биоалуантүрлілік бойынша негізгі экологиялық көрсеткіштерді көрсетеді.</p>
+                  </div>
+                </a>
+                <!-- 6 -->
+                <a href="https://www.worldbank.org/en/news/press-release/2018/02/05/kazakhstan-launched-online-platform-for-ghg-reporting" target="_blank" class="news-card-link">
+                  <div class="news-image" style="background-image:  url('img/6.jpg')"></div>
+                  <div class="news-content">
+                    <div class="date" data-i18n="news-date-6">2025 ж.</div>
+                    <h3 data-i18n="news-title-6">ЖЭК шығарындыларын есепке алудың онлайн платформасы іске қосылды</h3>
+                    <p data-i18n="news-desc-6">Қазақстан парниктік газдар шығарындыларын мониторингілеу, есепке алу және верификациялау үшін электрондық кадастр платформасын іске қосты.</p>
+                  </div>
+                </a>
+                <!-- 7 -->
+                <a href="https://timesca.com/asias-top-three-towns-for-air-quality-all-in-kazakhstan-finds-new-study/" target="_blank" class="news-card-link">
+                  <div class="news-image" style="background-image:  url('img/7.jpeg')"></div>
+                  <div class="news-content">
+                    <div class="date" data-i18n="news-date-7">2025 ж.</div>
+                    <h3 data-i18n="news-title-7">Азиядағы ең таза ауа – Қазақстан қалаларында</h3>
+                    <p data-i18n="news-desc-7">Жаңа зерттеу Азиядағы ауа сапасы ең жақсы үш қаланың барлығы Қазақстанда орналасқанын көрсетті.</p>
+                  </div>
+                </a>
+                <!-- 8 -->
+                <a href="https://igtipc.org/en/2025/09/30/9528/" target="_blank" class="news-card-link">
+                  <div class="news-image" style="background-image: url('img/8.png')"></div>
+                  <div class="news-content">
+                    <div class="date" data-i18n="news-date-8">2025 ж.</div>
+                    <h3 data-i18n="news-title-8">Қазақстанда экологиялық мониторингті кеңейту жоспары</h3>
+                    <p data-i18n="news-desc-8">Экология министрлігі Қытай серіктестерімен бірге ауа, су және топырақты жоғары дәлдікпен бақылау үшін жаңа цифрлық технологияларды енгізуді жоспарлап отыр.</p>
+                  </div>
+                </a>
+                <!-- 9 -->
+                <a href="https://energyandcleanair.org/wp/wp-content/uploads/2024/08/CREA_SteelWatch_HIA_ArcelorMittal_Temirtau_KZ_08.2024.pdf" target="_blank" class="news-card-link">
+                  <div class="news-image" style="background-image:   url('img/9.jpg')"></div>
+                  <div class="news-content">
+                    <div class="date" data-i18n="news-date-9">2025 ж.</div>
+                    <h3 data-i18n="news-title-9">Теміртаудағы болат зауытының ауа сапасына әсері</h3>
+                    <p data-i18n="news-desc-9">Зерттеу Теміртау болат зауытының шығарындылары Қазақстандағы ауа ластануына және халық денсаулығына елеулі әсер ететінін көрсетті.</p>
+                  </div>
+                </a>
+                <!-- 10 -->
+                <a href="https://spaceres.kz/en/the-activities/napravleniya-issledovanii-eng/environmental-monitoring/" target="_blank" class="news-card-link">
+                  <div class="news-image" style="background-image: url('img/10.jpeg')"></div>
+                  <div class="news-content">
+                    <div class="date" data-i18n="news-date-10">2025 ж.</div>
+                    <h3 data-i18n="news-title-10">Ғарыштық экологиялық мониторинг технологиялары</h3>
+                    <p data-i18n="news-desc-10">Қазақстанда қашықтықтан зондтау деректері арқылы шөлейттену мен қалдық полигондарын мониторингілеу бағыттары дамып жатыр.</p>
+                  </div>
+                </a>
+                <!-- 11 -->
+                <a href="https://qazinform.com/news/did-altay-ainabek-increase-the-water-level-in-the-aral-sea-conclusion-of-the-rse-kazhydromet-2f7bd7" target="_blank" class="news-card-link">
+                  <div class="news-image" style="background-image:  url('img/11.jpg')"></div>
+                  <div class="news-content">
+                    <div class="date" data-i18n="news-date-11">2024 ж.</div>
+                    <h3 data-i18n="news-title-11">Арал теңізі деңгейіне қатысты талдау</h3>
+                    <p data-i18n="news-desc-11">Казгидромет мамандары 2024 жылғы циклондық белсенділіктің Арал теңізі аймағындағы гидрологиялық жағдайға әсерін талдады.</p>
+                  </div>
+                </a>
+                <!-- 12 -->
+                <a href="https://www.business-humanrights.org/en/latest-news/oskemen-people-spoke-out-about-poor-air-quality/" target="_blank" class="news-card-link">
+                  <div class="news-image" style="background-image:  url('img/12.png')"></div>
+                  <div class="news-content">
+                    <div class="date" data-i18n="news-date-12">2024 ж.</div>
+                    <h3 data-i18n="news-title-12">Өскемен тұрғындары ауаның нашар сапасына қарсы шықты</h3>
+                    <p data-i18n="news-desc-12">Өскемен қаласының тұрғындары шығыс аймақтағы өнеркәсіптік шығарындылар мен ластану мәселелеріне назар аударуды талап етті.</p>
+                  </div>
+                </a>
+                <!-- 13 -->
+                <a href="https://www.tridge.com/news/kazhydromet-experts-predict-moderate-drought-luizec" target="_blank" class="news-card-link">
+                  <div class="news-image" style="background-image:  url('img/13.jpeg')"></div>
+                  <div class="news-content">
+                    <div class="date" data-i18n="news-date-13">2025 ж.</div>
+                    <h3 data-i18n="news-title-13">Орташа құрғақшылық 11 өңірде күтілуде</h3>
+                    <p data-i18n="news-desc-13">Казгидромет мамандары 2025 жылы Қазақстанның 11 өңірінде топырақтың орташа құрғау жағдайы болжанып отырғанын хабарлады.</p>
+                  </div>
+                </a>
+                <!-- 14 -->
+                <a href="https://www.worldbank.org/en/news/press-release/2023/04/25/kazakhstan-discusses-actions-to-reduce-air-pollution-with-partners" target="_blank" class="news-card-link">
+                  <div class="news-image" style="background-image:  url('img/14.jpeg')"></div>
+                  <div class="news-content">
+                    <div class="date" data-i18n="news-date-14">2024 ж.</div>
+                    <h3 data-i18n="news-title-14">Қазақстандағы ауа сапасы және денсаулыққа әсері</h3>
+                    <p data-i18n="news-desc-14">Зерттеулер бойынша, Қазақстанда ауа ластануы жыл сайын 10 мыңнан астам мерзімінен бұрын өлімге және миллиардтаған доллар шығынға әкеледі.</p>
+                  </div>
+                </a>
+                <!-- 15 -->
+                <a href="https://www.worldbank.org/en/news/press-release/2023/04/25/kazakhstan-discusses-actions-to-reduce-air-pollution-with-partners" target="_blank" class="news-card-link">
+                  <div class="news-image" style="background-image:   url('img/15.jpg')"></div>
+                  <div class="news-content">
+                    <div class="date" data-i18n="news-date-15">2024 ж.</div>
+                    <h3 data-i18n="news-title-15">Алматы мен Астанадағы қысқы смог</h3>
+                    <p data-i18n="news-desc-15">Қыста Алматы мен Астанада PM2.5 деңгейлері ДДСҰ нұсқаулықтарынан ондаған есе асып түседі, бұл тұрғындар денсаулығына қауіп төндіреді.</p>
+                  </div>
+                </a>
+                <!-- 16 -->
+                <a href="https://astanatimes.com/2026/01/kazakhstans-industrial-emissions-top-2-million-tons-in-2024/" target="_blank" class="news-card-link">
+                  <div class="news-image" style="background-image:   url('img/16.jpg')"></div>
+                  <div class="news-content">
+                    <div class="date" data-i18n="news-date-16">2024 ж.</div>
+                    <h3 data-i18n="news-title-16">Қазақстанда ауа сапасын бақылау посттары</h3>
+                    <p data-i18n="news-desc-16">Казгидромет ел бойынша 70 елді мекенде 171 бақылау бекеті арқылы атмосфералық ауаның сапасын бақылайды.</p>
+                  </div>
+                </a>
+                <!-- 17 -->
+                <a href="https://astanatimes.com/2026/01/kazakhstans-industrial-emissions-top-2-million-tons-in-2024/" target="_blank" class="news-card-link">
+                  <div class="news-image" style="background-image:   url('img/17.jpg')"></div>
+                  <div class="news-content">
+                    <div class="date" data-i18n="news-date-17">2024 ж.</div>
+                    <h3 data-i18n="news-title-17">Павлодар мен Қарағанды өңірлеріндегі шығарындылар</h3>
+                    <p data-i18n="news-desc-17">Павлодар және Қарағанды облыстары елдегі ластаушы заттар шығарындыларының ең үлкен көлеміне ие, бірақ кей жылдары біртіндеп төмендеу байқалады.</p>
+                  </div>
+                </a>
+                <!-- 18 -->
+                <a href="https://astanatimes.com/2026/01/kazakhstans-industrial-emissions-top-2-million-tons-in-2024/" target="_blank" class="news-card-link">
+                  <div class="news-image" style="background-image:  url('img/18.png')"></div>
+                  <div class="news-content">
+                    <div class="date" data-i18n="news-date-18">2024 ж.</div>
+                    <h3 data-i18n="news-title-18">Алматы мен Астанадағы шекті концентрациядан асу</h3>
+                    <p data-i18n="news-desc-18">2024 жылы алынған ауа сынамаларының 1,6%‑ында шекті рұқсат етілген концентрациялардан асу тіркелді, ең жоғары көрсеткіштер Алматы мен Астанада байқалды.</p>
+                  </div>
+                </a>
+                <!-- 19 -->
+                <a href="https://astanatimes.com/2026/01/kazakhstans-industrial-emissions-top-2-million-tons-in-2024/" target="_blank" class="news-card-link">
+                  <div class="news-image" style="background-image:  url('img/19.jpg')"></div>
+                  <div class="news-content">
+                    <div class="date" data-i18n="news-date-19">2024 ж.</div>
+                    <h3 data-i18n="news-title-19">Өнеркәсіптік шығарындылардағы қауіпті заттар</h3>
+                    <p data-i18n="news-desc-19">Қазақстандағы өнеркәсіптік шығарындылар құрамында 116‑ға дейін ластаушы зат бар, олардың 40‑қа жуығы жоғары қауіпті санатқа жатады.</p>
+                  </div>
+                </a>
+                <!-- 20 -->
+                <a href="https://astanatimes.com/2026/01/kazakhstans-industrial-emissions-top-2-million-tons-in-2024/" target="_blank" class="news-card-link">
+                  <div class="news-image" style="background-image: url('img/20.png')"></div>
+                  <div class="news-content">
+                    <div class="date" data-i18n="news-date-20">2024 ж.</div>
+                    <h3 data-i18n="news-title-20">Қазақстандағы ауа сапасын мониторингілеудің шектеулері</h3>
+                    <p data-i18n="news-desc-20">Қазіргі уақытта атмосфералық шығарындылардағы зиянды заттардың шамамен 58%‑ы ғана жүйелі түрде мониторингіленеді, кейбір өңірлерде қамту деңгейі одан да төмен.</p>
+                  </div>
+                </a>
+                <!-- 21 -->
+                <a href="https://unece.org/sites/default/files/2025-04/Sector%20Review%20Environment%20Statistics%202024%20Kazakhstan.pdf" target="_blank" class="news-card-link">
+                  <div class="news-image" style="background-image:  url('img/21.jpeg')"></div>
+                  <div class="news-content">
+                    <div class="date" data-i18n="news-date-21">2024 ж.</div>
+                    <h3 data-i18n="news-title-21">Қазақстанның жасыл экономикаға көшу тұжырымдамасы</h3>
+                    <p data-i18n="news-desc-21">Елдің жасыл экономикаға көшу тұжырымдамасы ауа сапасын жақсарту, қалдықтарды басқару және экожүйелерді қорғау жөніндегі шараларды қамтиды.</p>
+                  </div>
+                </a>
+                <!-- 22 -->
+                <a href="https://en.tengrinews.kz/kazakhstan_news/kazhydromet-reports-temperature-records-in-kazakhstan-268022/" target="_blank" class="news-card-link">
+                  <div class="news-image" style="background-image:  url('img/22.jpeg')"></div>
+                  <div class="news-content">
+                    <div class="date" data-i18n="news-date-22">2024 ж.</div>
+                    <h3 data-i18n="news-title-22">Каспий теңізі деңгейінің төмендеуі</h3>
+                    <p data-i18n="news-desc-22">Каспий теңізі деңгейінің төмендеуі экожүйелерге, жағалау инфрақұрылымына және экономикалық қызметке қауіп төндіреді.</p>
+                  </div>
+                </a>
+                <!-- 23 -->
+                <a href="https://en.tengrinews.kz/kazakhstan_news/kazhydromet-reports-temperature-records-in-kazakhstan-268022/" target="_blank" class="news-card-link">
+                  <div class="news-image" style="background-image: url('img/23.jpg')"></div>
+                  <div class="news-content">
+                    <div class="date" data-i18n="news-date-23">2024 ж.</div>
+                    <h3 data-i18n="news-title-23">Балқаш көліне климаттық әсер</h3>
+                    <p data-i18n="news-desc-23">2024 жылы Балқаш көліндегі температуралық аномалиялар су теңгерімі мен экожүйеге қосымша қауіп төндірді.</p>
+                  </div>
+                </a>
+                <!-- 24 -->
+                <a href="https://timesca.com/asias-top-three-towns-for-air-quality-all-in-kazakhstan-finds-new-study/" target="_blank" class="news-card-link">
+                  <div class="news-image" style="background-image:  url('img/24.jpg')"></div>
+                  <div class="news-content">
+                    <div class="date" data-i18n="news-date-24">2024 ж.</div>
+                    <h3 data-i18n="news-title-24">Қазақстандағы ең ластанған қалалардың бірі – Қарағанды</h3>
+                    <p data-i18n="news-desc-24">Қарағанды қаласында PM2.5‑тің жоғары орташа деңгейлері тұрғындардың денсаулығына айтарлықтай әсер етіп отыр.</p>
+                  </div>
+                </a>
+                <!-- 25 -->
+                <a href="https://www.worldbank.org/en/news/press-release/2018/02/05/kazakhstan-launched-online-platform-for-ghg-reporting" target="_blank" class="news-card-link">
+                  <div class="news-image" style="background-image:  url('img/25.jpg')"></div>
+                  <div class="news-content">
+                    <div class="date" data-i18n="news-date-25">2024 ж.</div>
+                    <h3 data-i18n="news-title-25">Қазақстандағы парниктік газдар шығарындыларын реттеу</h3>
+                    <p data-i18n="news-desc-25">Ұлттық шығарындылар сауда жүйесі энергетика және өнеркәсіп секторларындағы ірі компаниялар үшін квоталар мен онлайн сауданы қарастырады.</p>
+                  </div>
+                </a>
+                <!-- 26 -->
+                <a href="https://kazhydromet.kz/en/post/2862" target="_blank" class="news-card-link">
+                  <div class="news-image" style="background-image:  url('img/26.jpg')"></div>
+                  <div class="news-content">
+                    <div class="date" data-i18n="news-date-26">2024 ж.</div>
+                    <h3 data-i18n="news-title-26">Қазақстан мен Ресейдің Жайық экожүйесін сақтау жөніндегі комиссиясы</h3>
+                    <p data-i18n="news-desc-26">Қазақстан‑Ресей комиссиясының төртінші отырысында трансшекаралық Жайық өзенінің экожүйесін сақтауға бағытталған іс‑шаралар қаралды.</p>
+                  </div>
+                </a>
+                <!-- 27 -->
+                <a href="https://carececo.org/en/main/news/chto-obsuzhdali-kazakhstan-i-uzbekistan-na-7-om-zasedanii-kazakhstansko-uzbekistanskoy-sovmest/" target="_blank" class="news-card-link">
+                  <div class="news-image" style="background-image:  url('img/27.jpg')"></div>
+                  <div class="news-content">
+                    <div class="date" data-i18n="news-date-27">2024 ж.</div>
+                    <h3 data-i18n="news-title-27">Қазақстан мен Өзбекстанның бірлескен экологиялық бағдарламалары</h3>
+                    <p data-i18n="news-desc-27">Қазақстан мен Өзбекстан 2025–2027 жылдарға арналған трансшекаралық өзендер экожүйесін қалпына келтіру және ластану қаупін азайту бағдарламасын әзірлеуде.</p>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </section>          
+    </div>
+
+    <!-- Pollution Data Entry Page (Только для админа) -->
+<div class="pollution-data-page">
+    <section class="hero">
+        <div class="container">
+            <h2 data-i18n="pollution-data-title">Ластану деректерін енгізу</h2>
+            <p data-i18n="pollution-data-description">Су, ауа және қоқыс ластануы туралы деректерді енгізу және бақылау. Таза қоршаған орта үшін бірге жұмыс істейік!</p>
+        </div>
+    </section>
+
+    <section class="pollution-data-entry">
+        <div class="container">
+            <div class="form-container">
+                <!-- Pollution Type Tabs -->
+                <div class="pollution-type-tabs">
+                    <button class="pollution-type-tab active" data-type="water" data-i18n="water-pollution-tab">Су ластануы</button>
+                    <button class="pollution-type-tab" data-type="air" data-i18n="air-pollution-tab">Ауа ластануы</button>
+                    <button class="pollution-type-tab" data-type="waste" data-i18n="waste-pollution-tab">Қоқыс ластануы</button>
+                    <button class="pollution-type-tab" data-type="radioactive" data-i18n="radioactive-pollution-tab">Радиоактивті ластану</button>
+                    <button class="pollution-type-tab" data-type="noise" data-i18n="noise-pollution-tab">Шу ластануы</button>
+                </div>
+                
+                
+                <!-- Water Pollution Form -->
+                <form id="water-pollution-form" class="pollution-form active">
+                    <div class="form-group">
+                        <label for="water-source-type" data-i18n="water-source-type-label">Су көзінің түрі</label>
+                        <select id="water-source-type" class="form-control" required>
+                            <option value="" data-i18n="select-water-source-type">Су көзін таңдаңыз</option>
+                            <option value="river" data-i18n="river-water-source">Өзен</option>
+                            <option value="lake" data-i18n="lake-water-source">Көл</option>
+                            <option value="groundwater" data-i18n="groundwater-water-source">Жер асты суы</option>
+                            <option value="sea" data-i18n="sea-water-source">Теңіз</option>
+                            <option value="plumbing" data-i18n="plumbing-water-source">Cу құбыры</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="water-location" data-i18n="location-label">Орналасқан жері</label>
+                                <input type="text" id="water-location" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="water-date" data-i18n="date-label">Күні</label>
+                                <input type="date" id="water-date" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="water-pollution-type" data-i18n="pollution-type-label">Ластану түрі</label>
+                        <select id="water-pollution-type" class="form-control" required>
+                            <option value="" data-i18n="select-pollution-type">Ластану түрін таңдаңыз</option>
+                            <option value="chemical" data-i18n="chemical-pollution">Химиялық ластану</option>
+                            <option value="biological" data-i18n="biological-pollution">Биологиялық ластану</option>
+                            <option value="physical" data-i18n="physical-pollution">Физикалық ластану</option>
+                            <option value="pollution is absent" data-i18n="thermal-pollution">Ластану жоқ</option>
+                        </select>
+                    </div>
+                    
+                    <div id="water-chemical-fields" class="pollution-type-fields">
+                        <h3 data-i18n="chemical-pollution-parameters">Химиялық ластану параметрлері</h3>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label for="ph-level">pH деңгейі</label>
+                                    <input type="number" id="ph-level" class="form-control" step="0.1" min="0" max="14">
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label for="heavy-metals" data-i18n="heavy-metals-label">Ауыр металдар концентрациясы (мг/л)</label>
+                                    <input type="number" id="heavy-metals" class="form-control" step="0.001">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label for="nitrates" data-i18n="nitrates-label">Нитраттар концентрациясы (мг/л)</label>
+                                    <input type="number" id="nitrates" class="form-control" step="0.001">
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label for="phosphates" data-i18n="phosphates-label">Фосфаттар концентрациясы (мг/л)</label>
+                                    <input type="number" id="phosphates" class="form-control" step="0.001">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="water-order-id" data-i18n="order-id-label">Тапсырыс нөмірі (міндетті емес)</label>
+                        <input type="number" id="water-order-id" class="form-control" min="1">
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="water-hidden">
+                        <label for="water-hidden" data-i18n="hide-data-label">Деректерді жалпы қарауда көрсетпеу</label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="water-additional-notes" data-i18n="additional-notes-label">Қосымша ескертулер</label>
+                        <textarea id="water-additional-notes" class="form-control" rows="4"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-block" data-i18n="submit-water-data-button">Су ластануы туралы деректерді жіберу</button>
+                </form>
+                
+                <!-- Air Pollution Form -->
+                <form id="air-pollution-form" class="pollution-form">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="air-location" data-i18n="location-label">Орналасқан жері</label>
+                                <input type="text" id="air-location" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="air-date" data-i18n="date-label">Күні</label>
+                                <input type="date" id="air-date" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="air-pollution-type" data-i18n="pollution-type-label">Ластану түрі</label>
+                        <select id="air-pollution-type" class="form-control" required>
+                            <option value="" data-i18n="select-pollution-type">Ластану түрін таңдаңыз</option>
+                            <option value="industrial" data-i18n="industrial-pollution">Өнеркәсіптік ластану</option>
+                            <option value="transport" data-i18n="transport-pollution">Көлік ластануы</option>
+                            <option value="agricultural" data-i18n="agricultural-pollution">Ауылшаруашылық ластану</option>
+                            <option value="pollution is absent" data-i18n="thermal-pollution">Ластану жоқ</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="pm25">PM2.5 (мкг/м³)</label>
+                                <input type="number" id="pm25" class="form-control" step="0.1">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="pm10">PM10 (мкг/м³)</label>
+                                <input type="number" id="pm10" class="form-control" step="0.1">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="co">CO (мг/м³)</label>
+                                <input type="number" id="co" class="form-control" step="0.001">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="so2">SO₂ (мкг/м³)</label>
+                                <input type="number" id="so2" class="form-control" step="0.1">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="air-order-id" data-i18n="order-id-label">Тапсырыс нөмірі (міндетті емес)</label>
+                        <input type="number" id="air-order-id" class="form-control" min="1">
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="air-hidden">
+                        <label for="air-hidden" data-i18n="hide-data-label">Деректерді жалпы қарауда көрсетпеу</label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="air-additional-notes" data-i18n="additional-notes-label">Қосымша ескертулер</label>
+                        <textarea id="air-additional-notes" class="form-control" rows="4"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-block" data-i18n="submit-air-data-button">Ауа ластануы туралы деректерді жіберу</button>
+                </form>
+                
+                <!-- Waste Pollution Form -->
+                <form id="waste-pollution-form" class="pollution-form">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="waste-location" data-i18n="location-label">Орналасқан жері</label>
+                                <input type="text" id="waste-location" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="waste-date" data-i18n="date-label">Күні</label>
+                                <input type="date" id="waste-date" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="waste-type" data-i18n="waste-type-label">Қоқыс түрі</label>
+                        <select id="waste-type" class="form-control" required>
+                            <option value="" data-i18n="select-waste-type">Қоқыс түрін таңдаңыз</option>
+                            <option value="household" data-i18n="household-waste-type">Тұрмыстық қоқыс</option>
+                            <option value="industrial" data-i18n="industrial-waste-type">Өнеркәсіптік қоқыс</option>
+                            <option value="construction" data-i18n="construction-waste-type">Құрылыс қоқысы</option>
+                            <option value="hazardous" data-i18n="hazardous-waste-type">Қауіпті қоқыс</option>
+                            <option value="pollution is absent" data-i18n="thermal-pollution">Ластану жоқ</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="waste-volume" data-i18n="waste-volume-label">Қоқыс көлемі (м³)</label>
+                                <input type="number" id="waste-volume" class="form-control" step="0.1">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="waste-weight" data-i18n="waste-weight-label">Қоқыс салмағы (кг)</label>
+                                <input type="number" id="waste-weight" class="form-control" step="0.1">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="waste-order-id" data-i18n="order-id-label">Тапсырыс нөмірі (міндетті емес)</label>
+                        <input type="number" id="waste-order-id" class="form-control" min="1">
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="waste-hidden">
+                        <label for="waste-hidden" data-i18n="hide-data-label">Деректерді жалпы қарауда көрсетпеу</label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="waste-additional-notes" data-i18n="additional-notes-label">Қосымша ескертулер</label>
+                        <textarea id="waste-additional-notes" class="form-control" rows="4"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-block" data-i18n="submit-waste-data-button">Қоқыс ластануы туралы деректерді жіберу</button>
+                </form>
+                
+                <!-- Radioactive Pollution Form -->
+                <form id="radioactive-pollution-form" class="pollution-form">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="radioactive-location" data-i18n="location-label">Орналасқан жері</label>
+                                <input type="text" id="radioactive-location" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="radioactive-date" data-i18n="date-label">Күні</label>
+                                <input type="date" id="radioactive-date" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="radioactive-source-type" data-i18n="radiation-source-type-label">Радиация көзінің түрі</label>
+                        <select id="radioactive-source-type" class="form-control" required>
+                            <option value="" data-i18n="select-radiation-source-type">Радиация көзін таңдаңыз</option>
+                            <option value="natural" data-i18n="natural-radiation-source">Табиғи радиация</option>
+                            <option value="industrial" data-i18n="industrial-radiation-source">Өнеркәсіптік радиация</option>
+                            <option value="medical" data-i18n="medical-radiation-source">Медициналық радиация</option>
+                            <option value="nuclear" data-i18n="nuclear-radiation-source">Ядролық объектілер</option>
+                            <option value="accident" data-i18n="accident-radiation-source">Авариялық жағдай</option>
+                            <option value="pollution is absent" data-i18n="thermal-pollution">Ластану жоқ</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="radiation-level" data-i18n="radiation-level-label">Радиация деңгейі (мкЗв/сағ)</label>
+                                <input type="number" id="radiation-level" class="form-control" step="0.001" min="0">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="measurement-distance" data-i18n="measurement-distance-label">Өлшеу қашықтығы (м)</label>
+                                <input type="number" id="measurement-distance" class="form-control" step="1" min="0">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="gamma-radiation" data-i18n="gamma-radiation-label">Гамма-сәулелену (нГр/сағ)</label>
+                                <input type="number" id="gamma-radiation" class="form-control" step="0.01">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="beta-radiation" data-i18n="beta-radiation-label">Бета-сәулелену (част/см²·мин)</label>
+                                <input type="number" id="beta-radiation" class="form-control" step="0.1">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="radioactive-isotopes" data-i18n="radioactive-isotopes-label">Радиоактивті изотоптар (егер белгілі болса)</label>
+                        <input type="text" id="radioactive-isotopes" class="form-control" placeholder="Cs-137, Sr-90, I-131, т.б.">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="radioactive-order-id" data-i18n="order-id-label">Тапсырыс нөмірі (міндетті емес)</label>
+                        <input type="number" id="radioactive-order-id" class="form-control" min="1">
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="radioactive-hidden">
+                        <label for="radioactive-hidden" data-i18n="hide-data-label">Деректерді жалпы қарауда көрсетпеу</label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="radioactive-additional-notes" data-i18n="additional-notes-label">Қосымша ескертулер</label>
+                        <textarea id="radioactive-additional-notes" class="form-control" rows="4"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-block" data-i18n="submit-radioactive-data-button">Радиоактивті ластану туралы деректерді жіберу</button>
+                </form>
+                
+                <!-- Noise Pollution Form -->
+                <form id="noise-pollution-form" class="pollution-form">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="noise-location" data-i18n="location-label">Орналасқан жері</label>
+                                <input type="text" id="noise-location" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="noise-date" data-i18n="date-label">Күні</label>
+                                <input type="date" id="noise-date" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="noise-time" data-i18n="noise-time-label">Уақыт</label>
+                                <input type="time" id="noise-time" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="measurement-duration" data-i18n="measurement-duration-label">Өлшеу ұзақтығы (минут)</label>
+                                <input type="number" id="measurement-duration" class="form-control" step="1" min="1" value="10">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="noise-source-type" data-i18n="noise-source-type-label">Шу көзінің түрі</label>
+                        <select id="noise-source-type" class="form-control" required>
+                            <option value="" data-i18n="select-noise-source-type">Шу көзін таңдаңыз</option>
+                            <option value="transport" data-i18n="transport-noise-source">Көлік шуы</option>
+                            <option value="industrial" data-i18n="industrial-noise-source">Өнеркәсіптік шу</option>
+                            <option value="construction" data-i18n="construction-noise-source">Құрылыс шуы</option>
+                            <option value="commercial" data-i18n="commercial-noise-source">Коммерциялық шу</option>
+                            <option value="household" data-i18n="household-noise-source">Тұрмыстық шу</option>
+                            <option value="entertainment" data-i18n="entertainment-noise-source">Көңіл көтеру орындарының шуы</option>
+                            <option value="pollution is absent" data-i18n="thermal-pollution">Ластану жоқ</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="noise-level-day" data-i18n="noise-level-day-label">Күндізгі шу деңгейі (дБА)</label>
+                                <input type="number" id="noise-level-day" class="form-control" step="0.1" min="0" max="150">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="noise-level-night" data-i18n="noise-level-night-label">Түнгі шу деңгейі (дБА)</label>
+                                <input type="number" id="noise-level-night" class="form-control" step="0.1" min="0" max="150">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="noise-frequency" data-i18n="noise-frequency-label">Шу жиілік сипаттамасы</label>
+                        <select id="noise-frequency" class="form-control">
+                            <option value="" data-i18n="select-noise-frequency">Жиілік сипаттамасын таңдаңыз</option>
+                            <option value="low" data-i18n="low-frequency-noise">Төмен жиілікті шу</option>
+                            <option value="mid" data-i18n="mid-frequency-noise">Орташа жиілікті шу</option>
+                            <option value="high" data-i18n="high-frequency-noise">Жоғары жиілікті шу</option>
+                            <option value="broadband" data-i18n="broadband-noise">Кең жолақты шу</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="noise-order-id" data-i18n="order-id-label">Тапсырыс нөмірі (міндетті емес)</label>
+                        <input type="number" id="noise-order-id" class="form-control" min="1">
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="noise-hidden">
+                        <label for="noise-hidden" data-i18n="hide-data-label">Деректерді жалпы қарауда көрсетпеу</label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="noise-additional-notes" data-i18n="additional-notes-label">Қосымша ескертулер</label>
+                        <textarea id="noise-additional-notes" class="form-control" rows="4"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-block" data-i18n="submit-noise-data-button">Шу ластануы туралы деректерді жіберу</button>
+                </form>
+                
+                <!-- Environmental Assessment Form -->
+                <form id="assessment-form" class="pollution-form">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="assessment-location" data-i18n="location-label">Бағаланатын объектінің орналасқан жері</label>
+                                <input type="text" id="assessment-location" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="assessment-date" data-i18n="date-label">Бағалау күні</label>
+                                <input type="date" id="assessment-date" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="assessment-type" data-i18n="assessment-type-label">Экологиялық бағалау түрі</label>
+                        <select id="assessment-type" class="form-control" required>
+                            <option value="" data-i18n="select-assessment-type">Бағалау түрін таңдаңыз</option>
+                            <option value="construction" data-i18n="construction-assessment">Құрылыс алдындағы экологиялық бағалау</option>
+                            <option value="operational" data-i18n="operational-assessment">Қызмет көрсету кезіндегі экологиялық бағалау</option>
+                            <option value="monitoring" data-i18n="monitoring-assessment">Мониторингтік бағалау</option>
+                            <option value="accident" data-i18n="accident-assessment">Авариядан кейінгі экологиялық бағалау</option>
+                            <option value="strategic" data-i18n="strategic-assessment">Стратегиялық экологиялық бағалау</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="assessment-object" data-i18n="assessment-object-label">Бағаланатын объект</label>
+                        <input type="text" id="assessment-object" class="form-control" required placeholder="Зауыт, кен орыны, құрылыс алаңы, т.б.">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="assessment-parameters" data-i18n="assessment-parameters-label">Бағалау параметрлері</label>
+                        <div class="checkbox-group-column">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="param-air" name="assessment-parameters" value="air">
+                                <label for="param-air" data-i18n="air-quality-parameter">Ауа сапасы</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="param-water" name="assessment-parameters" value="water">
+                                <label for="param-water" data-i18n="water-quality-parameter">Су сапасы</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="param-soil" name="assessment-parameters" value="soil">
+                                <label for="param-soil" data-i18n="soil-quality-parameter">Топырақ сапасы</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="param-noise" name="assessment-parameters" value="noise">
+                                <label for="param-noise" data-i18n="noise-level-parameter">Шу деңгейі</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="param-radiation" name="assessment-parameters" value="radiation">
+                                <label for="param-radiation" data-i18n="radiation-level-parameter">Радиация деңгейі</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="param-biodiversity" name="assessment-parameters" value="biodiversity">
+                                <label for="param-biodiversity" data-i18n="biodiversity-parameter">Биоәртүрлілік</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="assessment-conclusion" data-i18n="assessment-conclusion-label">Бағалау қорытындысы</label>
+                        <select id="assessment-conclusion" class="form-control" required>
+                            <option value="" data-i18n="select-assessment-conclusion">Қорытындыны таңдаңыз</option>
+                            <option value="positive" data-i18n="positive-assessment">Оң - экологиялық талаптарға сәйкес келеді</option>
+                            <option value="conditional" data-i18n="conditional-assessment">Шартты - қосымша шаралар қажет</option>
+                            <option value="negative" data-i18n="negative-assessment">Теріс - экологиялық талаптарға сәйкес келмейді</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="recommendations" data-i18n="recommendations-label">Ұсыныстар мен шаралар</label>
+                        <textarea id="recommendations" class="form-control" rows="4" placeholder="Экологиялық жағдайды жақсарту бойынша ұсыныстар..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="next-assessment-date" data-i18n="next-assessment-date-label">Келесі бағалау күні (болжам)</label>
+                        <input type="date" id="next-assessment-date" class="form-control">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="assessment-order-id" data-i18n="order-id-label">Тапсырыс нөмірі (міндетті емес)</label>
+                        <input type="number" id="assessment-order-id" class="form-control" min="1">
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="assessment-hidden">
+                        <label for="assessment-hidden" data-i18n="hide-data-label">Деректерді жалпы қарауда көрсетпеу</label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="assessment-additional-notes" data-i18n="additional-notes-label">Қосымша ескертулер</label>
+                        <textarea id="assessment-additional-notes" class="form-control" rows="4"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-block" data-i18n="submit-assessment-data-button">Экологиялық бағалау туралы деректерді жіберу</button>
+                </form>
+            </div>
+        </div>
+    </section>
+</div>
+
+
+    <!-- Services Page (Для обычных пользователей) -->
+    <div class="services-page">
+        <section class="hero">
+            <div class="container">
+                <h2 data-i18n="services-title">Қызметтер</h2>
+                <p data-i18n="services-description">Экологиялық мониторинг және талдау қызметтері. Біз сізге келесі қызметтерді ұсынамыз</p>
+            </div>
+        </section>
+
+        <section class="services-list">
+            <div class="container">
+                <div class="services-grid">
+                    <!-- Услуга 1: Проверка воды -->
+                    <div class="service-card">
+                        <div class="no-image">
+                            <div class="feature-icon">💧</div>
+                        </div>
+                        <div class="service-content">
+                            <h3 data-i18n="service-1-title">Суыңыздың жарамдылығын тексеру</h3>
+                            <p data-i18n="service-1-desc">Суыңыздың химиялық, бактериологиялық және физикалық көрсеткіштерін толық талдау. Ауыр металдар, нитраттар, пестицидтер және басқа ластаушыларды анықтау.</p>
+                            <div class="price-tag" data-i18n="service-1-price">15 000 ₸</div>
+                            <button class="btn btn-block order-service-btn" data-service-id="1" data-service-price="15000" style="margin-top: 15px;" data-i18n="order-service-button">Тапсырыс беру</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Услуга 2: Проверка воздуха -->
+                    <div class="service-card">
+                        <div class="no-image">
+                            <div class="feature-icon">🌫️</div>
+                        </div>
+                        <div class="service-content">
+                            <h3 data-i18n="service-2-title">Ауа сапасын тексеру</h3>
+                            <p data-i18n="service-2-desc">Ауаның ластану деңгейін анықтау: PM2.5, PM10, күкірт диоксиді, азот оксиді, озон және басқа зиянды заттардың концентрациясын өлшеу.</p>
+                            <div class="price-tag" data-i18n="service-2-price">18 000 ₸</div>
+                            <button class="btn btn-block order-service-btn" data-service-id="2" data-service-price="18000" style="margin-top: 15px;" data-i18n="order-service-button">Тапсырыс беру</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Услуга 3: Проверка территории -->
+                    <div class="service-card">
+                        <div class="no-image">
+                            <div class="feature-icon">🗺️</div>
+                        </div>
+                        <div class="service-content">
+                            <h3 data-i18n="service-3-title">Аймақтың экологиялық жағдайын бағалау</h3>
+                            <p data-i18n="service-3-desc">Аймақтың жалпы экологиялық жағдайын талдау: топырақтың ластануы, радиациялық фон, биологиялық әртүрлілік және экожүйелік қызметтерді бағалау.</p>
+                            <div class="price-tag" data-i18n="service-3-price">25 000 ₸</div>
+                            <button class="btn btn-block order-service-btn" data-service-id="3" data-service-price="25000" style="margin-top: 15px;" data-i18n="order-service-button">Тапсырыс беру</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Услуга 4: Проверка шумового загрязнения -->
+                    <div class="service-card">
+                        <div class="no-image">
+                            <div class="feature-icon">🔊</div>
+                        </div>
+                        <div class="service-content">
+                            <h3 data-i18n="service-4-title">Дыбыстық ластануды өлшеу</h3>
+                            <p data-i18n="service-4-desc">Күн ішіндегі әртүрлі уақыттарда дыбыстық деңгейді өлшеу және санитарлық нормаларға сәйкестігін тексеру. Шумықтық карта құру.</p>
+                            <div class="price-tag" data-i18n="service-4-price">12 000 ₸</div>
+                            <button class="btn btn-block order-service-btn" data-service-id="4" data-service-price="12000" style="margin-top: 15px;" data-i18n="order-service-button">Тапсырыс беру</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Услуга 5: Полная экологическая экспертиза -->
+                    <div class="service-card">
+                        <div class="no-image">
+                            <div class="feature-icon">🏭</div>
+                        </div>
+                        <div class="service-content">
+                            <h3 data-i18n="service-5-title">Толық экологиялық сараптама</h3>
+                            <p data-i18n="service-5-desc">Объектінің толық экологиялық сараптамасы: ауа, су, топырақ, дыбыстық ластануды талдау, экологиялық қауіптерді бағалау және ұсынымдар дайындау.</p>
+                            <div class="price-tag" data-i18n="service-5-price">35 000 ₸</div>
+                            <button class="btn btn-block order-service-btn" data-service-id="5" data-service-price="35000" style="margin-top: 15px;" data-i18n="order-service-button">Тапсырыс беру</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Услуга 6: Радиационный контроль -->
+                    <div class="service-card">
+                        <div class="no-image">
+                            <div class="feature-icon">☢️</div>
+                        </div>
+                        <div class="service-content">
+                            <h3 data-i18n="service-6-title">Радиациялық мониторинг</h3>
+                            <p data-i18n="service-6-desc">Радиациялық фонды өлшеу, радиоактивті изотоптарды анықтау, гамма-сәулеленуді бақылау және адам денсаулығына қауіптілігін бағалау.</p>
+                            <div class="price-tag" data-i18n="service-6-price">20 000 ₸</div>
+                            <button class="btn btn-block order-service-btn" data-service-id="6" data-service-price="20000" style="margin-top: 15px;" data-i18n="order-service-button">Тапсырыс беру</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Форма заказа услуги -->
+                <div class="form-container" id="order-form-container" style="display: none; margin-top: 40px;">
+                    <h3 class="section-title" data-i18n="order-form-title">Қызметті тапсырыс беру</h3>
+                    <form id="service-order-form">
+                        <div class="form-group">
+                            <label for="selected-service" data-i18n="selected-service-label">Таңдалған қызмет</label>
+                            <input type="text" id="selected-service" class="form-control" readonly>
+                            <input type="hidden" id="selected-service-id">
+                            <input type="hidden" id="selected-service-price">
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label for="order-date" data-i18n="order-date-label">Өлшеу күні</label>
+                                    <input type="date" id="order-date" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label for="order-address" data-i18n="order-address-label">Мекенжай</label>
+                                    <input type="text" id="order-address" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label for="order-phone" data-i18n="order-phone-label">Телефон нөмірі</label>
+                                    <input type="tel" id="order-phone" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label for="order-email" data-i18n="order-email-label">Электрондық пошта</label>
+                                    <input type="email" id="order-email" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="order-hide-data">
+                            <label for="order-hide-data" data-i18n="hide-data-user-label">Деректерді жалпы қарауда көрсетпеу</label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="order-notes" data-i18n="order-notes-label">Қосымша ескертулер</label>
+                            <textarea id="order-notes" class="form-control" rows="4" placeholder="Өлшеу талаптары, ерекше талаптар немесе қосымша ақпарат"></textarea>
+                        </div>
+                        
+                        <div class="form-group" style="background-color: var(--primary-light); padding: 15px; border-radius: 5px;">
+                            <h4 data-i18n="order-summary-title">Тапсырыс қорытындысы</h4>
+                            <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+                                <span data-i18n="order-total-label">Жалпы сома:</span>
+                                <span id="order-total-amount" style="font-weight: bold; font-size: 1.2rem;">0 ₸</span>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-block" data-i18n="submit-order-button">Тапсырыс беру</button>
+                        <button type="button" class="btn btn-secondary btn-block" id="cancel-order-btn" style="margin-top: 10px;" data-i18n="cancel-order-button">Болдырмау</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- My Orders Page (Для обычных пользователей) -->
+    <div class="my-orders-page">
+        <section class="hero">
+            <div class="container">
+                <h2 data-i18n="my-orders-title">Менің тапсырыстарым</h2>
+                <p data-i18n="my-orders-description">Барлық тапсырыстарыңыздың тізімі, олардың статустары және төлем ақпараты</p>
+            </div>
+        </section>
+
+        <section class="my-orders">
+            <div class="container">
+                <div id="orders-container">
+                    <!-- Заказы будут загружаться здесь динамически -->
+                </div>
+                
+                <div id="no-orders-message" class="no-orders" style="display: none;">
+                    <h3 data-i18n="no-orders-title">Тапсырыстар табылмады</h3>
+                    <p data-i18n="no-orders-description">Сізде әлі тапсырыс жоқ. Алғашқы тапсырысты беру үшін <a href="#" class="nav-link" data-page="services" style="color: var(--primary-color);">Қызметтер</a> бөліміне өтіңіз.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-col">
+                    <div class="logo" style="justify-content: flex-start; margin-bottom: 15px;">
+                        <img src="img/icon.png" alt="Экологиялық ахуалды бақылау жүйесі" style="height: 40px;">
+                        <h3 style="margin: 0; padding-bottom: 0;" data-i18n="site-title">Экологиялық ахуалды бақылау жүйесі</h3>
+                    </div>
+                    <p data-i18n="footer-description">Қоқыс орындары мен ауа сапасы туралы деректерді енгізу және көруге арналған интеграцияланған жүйе.</p>
+                </div>
+                <div class="footer-col">
+                    <h3 data-i18n="contact-title">Байланыс</h3>
+                    <ul>
+                        <li><a href="#" data-i18n="phone-link">Телефон: +7 (777) 123-45-67</a></li>
+                        <li><a href="#" data-i18n="email-link">Электронды пошта: info@eco-monitoring.kz</a></li>
+                        <li><a href="#" data-i18n="address-link">Мекенжай: Экология көшесі, 123</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3 data-i18n="quick-links">Жылдам сілтемелер</h3>
+                    <ul>
+                        <li><a href="#" class="nav-link" data-page="main" data-i18n="nav-home">Басты бет</a></li>
+                        <li><a href="#" class="nav-link" data-page="data-view" data-i18n="nav-data-view">Деректерді көру</a></li>
+                        <li><a href="#" class="nav-link" data-page="news" data-i18n="nav-news">Эко-жаңалықтар</a></li>
+                        <!-- Для администратора -->
+                        <li class="admin-only"><a href="#" class="nav-link" data-page="pollution-data" data-i18n="nav-pollution-data">Ластану деректерін енгізу</a></li>
+                        <!-- Для обычных пользователей -->
+                        <li class="user-only"><a href="#" class="nav-link" data-page="services" data-i18n="nav-services">Қызметтер</a></li>
+                        <li class="user-only"><a href="#" class="nav-link" data-page="my-orders" data-i18n="nav-my-orders">Менің тапсырыстарым</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p data-i18n="copyright">&copy; 2023 Экологиялық ахуалды бақылау жүйесі. Барлық құқықтар қорғалған.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
